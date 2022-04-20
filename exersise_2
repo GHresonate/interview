@@ -1,0 +1,72 @@
+from flask import request
+from flask import Flask
+
+app = Flask(__name__)
+
+
+class LengthException(Exception):
+    def __init__(self):
+        self.text = 'One or more names is too long'
+
+
+class SymbolException(Exception):
+    def __init__(self):
+        self.text = 'One or more symbols are incorrect'
+
+
+def making_list(names):
+    list_of_names = []
+    name = ''
+    for x in names:
+        if x == ',':
+            list_of_names.append(name)
+            name = ''
+        else:
+            name += x
+    list_of_names.append(name)
+    return list_of_names
+
+
+def validator(names):
+    for name in names:
+        if len(name) > 10:
+            raise LengthException
+        if not name.isalpha():
+            raise SymbolException
+
+
+def making_response(list_of_names):
+    response = '{<br>"error": False<br>'
+
+    if len(list_of_names) == 0:
+        response += ' Никто не лайкнул это<br>'
+    elif len(list_of_names) == 1:
+        response += '"data":' + str(list_of_names[0])
+        if list_of_names[0][-1] == 'а' or list_of_names[0][-1] == 'я':
+            response += ' лайкнула это<br>'
+        else:
+            response += ' лайкнул это<br>'
+    elif len(list_of_names) == 2:
+        response += '"data":' + str(list_of_names[0]) + ' и ' + str(list_of_names[1]) + ' лайкнули это<br>'
+    elif len(list_of_names) == 3:
+        response += '"data":' + str(list_of_names[0]) + ' и ' + str(list_of_names[1]) + \
+                    ' и ' + str(list_of_names[2]) + ' лайкнули это<br>'
+    elif len(list_of_names) <= 6:
+        response += '"data":' + str(list_of_names[0]) + ', ' + str(list_of_names[1]) + \
+                    f' и ещё {len(list_of_names) - 2} человека лайкнули это<br>'
+    else:
+        response += '"data":' + str(list_of_names[0]) + ', ' + str(list_of_names[1]) + \
+                    f' и ещё {len(list_of_names) - 2} человек лайкнули это<br>'
+
+    response += '"error_message": None<br>}'
+    return response
+
+
+@app.route('/likes')
+def likes():
+    try:
+        names = request.args.get('names')
+        list_of_names = making_list(names)
+        if len(names) == 0:
+            list_of_names = []
+        validator(list_of_names)
