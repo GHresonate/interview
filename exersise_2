@@ -15,6 +15,7 @@ class SymbolException(Exception):
 
 
 def making_list(names):
+    """Making the list of names from the string with names"""
     list_of_names = []
     name = ''
     for x in names:
@@ -28,6 +29,7 @@ def making_list(names):
 
 
 def validator(names):
+    """Validity check"""
     for name in names:
         if len(name) > 10:
             raise LengthException
@@ -35,38 +37,54 @@ def validator(names):
             raise SymbolException
 
 
-def making_response(list_of_names):
-    response = '{<br>"error": False<br>'
-
+def making_data(list_of_names):
+    """Make good-looking data in a bad-looking function"""
     if len(list_of_names) == 0:
-        response += ' Никто не лайкнул это<br>'
+        response = ' Никто не лайкнул это'
     elif len(list_of_names) == 1:
-        response += '"data":' + str(list_of_names[0])
+        response = list_of_names[0]
         if list_of_names[0][-1] == 'а' or list_of_names[0][-1] == 'я':
-            response += ' лайкнула это<br>'
+            response += ' лайкнула это'
         else:
-            response += ' лайкнул это<br>'
+            response += ' лайкнул это'
     elif len(list_of_names) == 2:
-        response += '"data":' + str(list_of_names[0]) + ' и ' + str(list_of_names[1]) + ' лайкнули это<br>'
+        response = list_of_names[0] + ' и ' + list_of_names[1] + ' лайкнули это'
     elif len(list_of_names) == 3:
-        response += '"data":' + str(list_of_names[0]) + ' и ' + str(list_of_names[1]) + \
-                    ' и ' + str(list_of_names[2]) + ' лайкнули это<br>'
+        response = list_of_names[0] + ' и ' + list_of_names[1] + \
+                    ' и ' + list_of_names[2] + ' лайкнули это'
     elif len(list_of_names) <= 6:
-        response += '"data":' + str(list_of_names[0]) + ', ' + str(list_of_names[1]) + \
-                    f' и ещё {len(list_of_names) - 2} человека лайкнули это<br>'
+        response = list_of_names[0] + ', ' + list_of_names[1] + \
+                    f' и ещё {len(list_of_names) - 2} человека лайкнули это'
     else:
-        response += '"data":' + str(list_of_names[0]) + ', ' + str(list_of_names[1]) + \
-                    f' и ещё {len(list_of_names) - 2} человек лайкнули это<br>'
+        response = list_of_names[0] + ', ' + list_of_names[1] + \
+                    f' и ещё {len(list_of_names) - 2} человек лайкнули это'
+    return making_response(response)
 
-    response += '"error_message": None<br>}'
-    return response
+
+def making_response(data=None, error=False, error_message=None):
+    """Making the final response to return it to the user"""
+    return f'"{{<br>' \
+           f'error": {error}<br>' \
+           f'"data": {data}<br>'\
+           f'"error_mesage": {error_message}<br>' \
+           f'}}'
 
 
 @app.route('/likes')
 def likes():
+    """The main function of this program. Accept names of users, which liked something and print a formatted response"""
     try:
         names = request.args.get('names')
         list_of_names = making_list(names)
         if len(names) == 0:
             list_of_names = []
         validator(list_of_names)
+
+        return making_data(list_of_names)
+
+    except (LengthException, SymbolException) as E:
+        return making_response(error=True, error_message=E.text)
+
+
+if __name__ == "__main__":
+    app.run(host='127.0.0.1', port=8000)
