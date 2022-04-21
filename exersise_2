@@ -1,3 +1,4 @@
+from flask import render_template
 from flask import request
 from flask import Flask
 
@@ -50,7 +51,7 @@ def making_data(list_of_names):
     elif len(list_of_names) == 2:
         response = list_of_names[0] + ' и ' + list_of_names[1] + ' лайкнули это'
     elif len(list_of_names) == 3:
-        response = list_of_names[0] + ' и ' + list_of_names[1] + \
+        response = list_of_names[0] + ', ' + list_of_names[1] + \
                     ' и ' + list_of_names[2] + ' лайкнули это'
     elif len(list_of_names) <= 6:
         response = list_of_names[0] + ', ' + list_of_names[1] + \
@@ -63,11 +64,8 @@ def making_data(list_of_names):
 
 def making_response(data=None, error=False, error_message=None):
     """Making the final response to return it to the user"""
-    return f'"{{<br>' \
-           f'error": {error}<br>' \
-           f'"data": {data}<br>'\
-           f'"error_mesage": {error_message}<br>' \
-           f'}}'
+    return render_template('likes.html', data=data, error=error, error_message=error_message)
+
 
 
 @app.route('/likes')
