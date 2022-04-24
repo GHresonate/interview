@@ -52,20 +52,19 @@ def making_data(list_of_names):
         response = list_of_names[0] + ' и ' + list_of_names[1] + ' лайкнули это'
     elif len(list_of_names) == 3:
         response = list_of_names[0] + ', ' + list_of_names[1] + \
-                    ' и ' + list_of_names[2] + ' лайкнули это'
+                   ' и ' + list_of_names[2] + ' лайкнули это'
     elif len(list_of_names) <= 6:
         response = list_of_names[0] + ', ' + list_of_names[1] + \
-                    f' и ещё {len(list_of_names) - 2} человека лайкнули это'
+                   f' и ещё {len(list_of_names) - 2} человека лайкнули это'
     else:
         response = list_of_names[0] + ', ' + list_of_names[1] + \
-                    f' и ещё {len(list_of_names) - 2} человек лайкнули это'
-    return making_response(response)
+                   f' и ещё {len(list_of_names) - 2} человек лайкнули это'
+    return response
 
 
 def making_response(data=None, error=False, error_message=None):
     """Making the final response to return it to the user"""
     return render_template('likes.html', data=data, error=error, error_message=error_message)
-
 
 
 @app.route('/likes')
@@ -77,8 +76,8 @@ def likes():
         if len(names) == 0:
             list_of_names = []
         validator(list_of_names)
-
-        return making_data(list_of_names)
+        data = making_data(list_of_names)
+        return making_response(data)
 
     except (LengthException, SymbolException) as E:
         return making_response(error=True, error_message=E.text)
