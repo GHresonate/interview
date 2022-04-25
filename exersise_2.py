@@ -18,6 +18,8 @@ class SymbolException(Exception):
 def making_list(names):
     """Making the list of names from the string with names"""
     list_of_names = []
+    if len(names) == 0:
+        return list_of_names
     name = ''
     for x in names:
         if x == ',':
@@ -73,8 +75,6 @@ def likes():
     try:
         names = request.args.get('names')
         list_of_names = making_list(names)
-        if len(names) == 0:
-            list_of_names = []
         validator(list_of_names)
         data = making_data(list_of_names)
         return making_response(data)
